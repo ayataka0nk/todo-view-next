@@ -1,0 +1,20 @@
+name: Build Develop Image
+on:
+  push:
+    paths:
+    - '/Dockerfile'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+ build:
+   runs-on: ubuntu-latest
+   steps:
+    - name: Login to DockerHub Registry
+      run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+    - name: Get the version
+      id: vars
+      run: echo ::set-output name=tag::$(echo ${GITHUB_REF#refs/heads/})
+    - name: Build the tagged Docker Image
+      run: docker build . --file Dockerfile --tag ayataka0nk/todo-view-next-dev:${{steps.vars.outputs.tag}} --target dev
+    - name: Push the tagged Docker image
+      run: docker push ayataka0nk/todo-view-next-dev:${{steps.vars.outputs.tag}}
