@@ -16,6 +16,6 @@ jobs:
       id: vars
       run: echo ::set-output name=tag::$(echo ${GITHUB_REF#refs/heads/})
     - name: Build the tagged Docker Image
-      run: docker build . --file Dockerfile --tag ayataka0nk/next-todo-view:${{steps.vars.outputs.tag}} --target prod
+      run: docker build . --file Dockerfile --tag ayataka0nk/todo-view-next:${{steps.vars.outputs.tag}} --target prod
     - name: Push the tagged Docker image
-      run: docker push ayataka0nk/next-todo-view:${{steps.vars.outputs.tag}}
+      run: docker push ayataka0nk/todo-view-next:${{steps.vars.outputs.tag}}
