@@ -1,8 +1,9 @@
 import React, { ReactElement } from 'react'
 import { GetServerSideProps } from 'next'
+import { resolveApiPath } from '../lib/ApiPathResolver'
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const dataUrl = process.env.apiPrefix + '/api/connect-test'
+  const dataUrl = resolveApiPath('/api/connect-test')
   const data = await fetch(dataUrl).then((r) => r.json())
   return {
     props: {
@@ -18,7 +19,6 @@ interface task {
 
 export default function ConnectTest(props: { data: task }): ReactElement {
   const task = props.data
-  console.log(props)
   return (
     <>
       <div>
