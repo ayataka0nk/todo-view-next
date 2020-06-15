@@ -3,6 +3,7 @@ import { GetServerSideProps } from 'next'
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const dataUrl = process.env.apiPrefix + '/api/connect-test'
+  console.log(dataUrl)
   const data = await fetch(dataUrl).then((r) => r.json())
   return {
     props: {
