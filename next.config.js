@@ -13,5 +13,5 @@ const getApiPrefix = () => {
 }
 
 module.exports = {
-  env: { apiPrefix: getApiPrefix() },
+  env: { apiPrefix: 'todo-api-express' },
 }
