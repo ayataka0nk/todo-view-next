@@ -4,7 +4,6 @@ import { resolveApiPath } from '../lib/ApiPathResolver'
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const dataUrl = resolveApiPath('/api/connect-test')
-  console.log(dataUrl)
   const data = await fetch(dataUrl).then((r) => r.json())
   return {
     props: {
@@ -20,7 +19,6 @@ interface task {
 
 export default function ConnectTest(props: { data: task }): ReactElement {
   const task = props.data
-  console.log(props)
   return (
     <>
       <div>
