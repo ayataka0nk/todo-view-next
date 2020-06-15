@@ -1,8 +1,9 @@
 import React, { ReactElement } from 'react'
 import { GetServerSideProps } from 'next'
+import { resolveApiPath } from '../lib/ApiPathResolver'
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const dataUrl = process.env.apiPrefix + '/api/connect-test'
+  const dataUrl = resolveApiPath('/api/connect-test')
   console.log(dataUrl)
   const data = await fetch(dataUrl).then((r) => r.json())
   return {
