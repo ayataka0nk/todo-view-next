@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react'
+import { GetServerSideProps } from 'next'
 
-export const getServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const dataUrl = process.env.apiPrefix + '/api/connect-test'
   const data = await fetch(dataUrl).then((r) => r.json())
   return {
@@ -30,7 +31,7 @@ export default function ConnectTest(props: { data: task }): ReactElement {
       </div>
       <div>
         <span>isFinished: </span>
-        <span>{task.isFinished.toString}</span>
+        <span>{task.isFinished.toString()}</span>
       </div>
     </>
   )
