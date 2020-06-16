@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Textbox } from '../components/Textbox'
-import { resolveApiPathClient } from '../clientlib/ApiPathResolver'
+import { resolveApiPath } from '../clientlib/ApiPathResolver'
 
 type Task = {
   id: number
@@ -12,7 +12,7 @@ const fetchAllTasks = async (): Promise<{
   props: { tasks: Task[] }
 }> => {
   console.log('fetch called')
-  const dataUrl = resolveApiPathClient('/api/tasks')
+  const dataUrl = resolveApiPath('/api/tasks')
   const tasks = await fetch(dataUrl).then((r) => r.json())
   return tasks
 }
@@ -88,7 +88,7 @@ export default function Todo(): JSX.Element {
     const data = {
       text: text,
     }
-    const urlTask = resolveApiPathClient('/api/tasks')
+    const urlTask = resolveApiPath('/api/tasks')
     const options = {
       method: 'POST',
       body: JSON.stringify(data),
