@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react'
 import { GetServerSideProps } from 'next'
-import { resolveApiPath } from '../lib/ApiPathResolver'
+import { resolveApiPath } from '../apilib/ApiPathResolver'
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const dataUrl = resolveApiPath('/api/connect-test')

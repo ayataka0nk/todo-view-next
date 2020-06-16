@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { resolveApiPath } from '../lib/ApiPathResolver'
+import { resolveApiPath } from '../apilib/ApiPathResolver'
 import { Textbox } from '../components/Textbox'
 import getConfig from 'next/config'
 
