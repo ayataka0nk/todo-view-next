@@ -66,6 +66,22 @@ const FinishedItem = function (props: {
     </div>
   )
 }
+/**分離予定 */
+const addTask = async (text: string) => {
+  const data = {
+    text: text,
+  }
+  const urlTask = resolveApiPath('/api/tasks')
+  const options = {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+  }
+  const resJson = await fetch(urlTask, options).then((r) => r.json())
+  return resJson
+}
 
 export default function Todo(): JSX.Element {
   const [data, setData] = useState([])
@@ -83,26 +99,16 @@ export default function Todo(): JSX.Element {
     })
     setData(newData)
   }
-  /**分離予定 */
-  const addTask = async (text: string) => {
-    const data = {
-      text: text,
-    }
-    const urlTask = resolveApiPath('/api/tasks')
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    }
-    const resJson = await fetch(urlTask, options).then((r) => r.json())
-    return resJson
+  const addTaskClick = async (text: string): void => {
+    await addTask(text)
+    const data = await fetchAllTasks()
+    setData(data)
   }
+
   return (
     <>
       <h1>TODOLIST</h1>
-      <TaskAddForm onAdd={addTask} />
+      <TaskAddForm onAdd={addTaskClick} />
       <h2>未完了</h2>
       <div>
         {data
