@@ -21,7 +21,7 @@ export default function ConnectTest(): ReactElement {
       setTask(task)
     }
     asyncWrap()
-  }, setTask)
+  }, [setTask])
 
   return (
     <>
