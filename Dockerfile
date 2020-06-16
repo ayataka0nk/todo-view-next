@@ -1,4 +1,4 @@
-FROM node:14-buster-slim as dev
+FROM node:12-buster-slim as dev
 RUN apt-get update && apt-get install -y \
     git locales \
     && apt-get clean \
