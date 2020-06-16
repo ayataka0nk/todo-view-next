@@ -1,31 +1,22 @@
-import React, { useState } from 'react'
-import { resolveApiPath } from '../apilib/ApiPathResolver'
+import React, { useState, useEffect } from 'react'
 import { Textbox } from '../components/Textbox'
-import getConfig from 'next/config'
+import { resolveApiPathClient } from '../clientlib/ApiPathResolver'
 
 type Task = {
   id: number
   text: string
   isFinished: boolean
 }
-//後で分ける
-const resolveApiPathClient = (apiPathname: string): string => {
-  const { publicRuntimeConfig } = getConfig()
-  const origin = publicRuntimeConfig.publicApiOrigin
-  return new URL(apiPathname, origin).toString()
-}
 
-export const getServerSideProps = async (): Promise<{
+const fetchAllTasks = async (): Promise<{
   props: { tasks: Task[] }
 }> => {
-  const dataUrl = resolveApiPath('/api/tasks')
+  console.log('fetch called')
+  const dataUrl = resolveApiPathClient('/api/tasks')
   const tasks = await fetch(dataUrl).then((r) => r.json())
-  return {
-    props: {
-      tasks: tasks,
-    },
-  }
+  return tasks
 }
+
 const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   const { onAdd } = props
   const [text, setText] = useState('')
@@ -76,9 +67,12 @@ const FinishedItem = function (props: {
   )
 }
 
-export default function Todo(props: { tasks: Task[] }): JSX.Element {
-  const [data, setData] = useState(props.tasks)
-
+export default function Todo(): JSX.Element {
+  const [data, setData] = useState([])
+  useEffect(async () => {
+    const tasks = await fetchAllTasks()
+    setData(tasks)
+  }, [setData])
   const toggleFinishState = (id: number): void => {
     const newData = data.map((record) => {
       if (record['id'] === id) {
