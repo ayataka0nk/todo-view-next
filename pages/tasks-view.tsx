@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Textbox } from '../components/Textbox'
-import { resolveApiPath } from '../clientlib/ApiPathResolver'
+import { resolveApiPath } from '../libs/ApiPathResolver'
 
 type Task = {
   id: number
@@ -8,9 +8,7 @@ type Task = {
   isFinished: boolean
 }
 
-const fetchAllTasks = async (): Promise<{
-  props: { tasks: Task[] }
-}> => {
+const fetchAllTasks = async (): Promise<Task[]> => {
   console.log('fetch called')
   const dataUrl = resolveApiPath('/api/tasks')
   const tasks = await fetch(dataUrl).then((r) => r.json())
@@ -84,10 +82,13 @@ const addTask = async (text: string) => {
 }
 
 export default function Todo(): JSX.Element {
-  const [data, setData] = useState([])
-  useEffect(async () => {
-    const tasks = await fetchAllTasks()
-    setData(tasks)
+  const [data, setData] = useState<Task[]>([])
+  useEffect(() => {
+    const asyncWrap = async () => {
+      const tasks = await fetchAllTasks()
+      setData(tasks)
+    }
+    asyncWrap()
   }, [setData])
   const toggleFinishState = (id: number): void => {
     const newData = data.map((record) => {
@@ -99,7 +100,7 @@ export default function Todo(): JSX.Element {
     })
     setData(newData)
   }
-  const addTaskClick = async (text: string): void => {
+  const addTaskClick = async (text: string): Promise<void> => {
     await addTask(text)
     const data = await fetchAllTasks()
     setData(data)
