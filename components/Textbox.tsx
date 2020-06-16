@@ -4,7 +4,7 @@ type TextboxProps = {
   name: string
   value: string
   onChange: (name: string, value: string) => void
-  readOnly: boolean
+  readOnly?: boolean
 }
 
 export const Textbox = (props: TextboxProps): JSX.Element => {
