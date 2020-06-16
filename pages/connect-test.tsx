@@ -14,7 +14,7 @@ interface Task {
 }
 
 export default function ConnectTest(): ReactElement {
-  const [task, setTask] = useState({})
+  const [task, setTask] = useState<Task | null>(null)
   useEffect(() => {
     const asyncWrap = async () => {
       const task = await fetchData()
@@ -27,15 +27,15 @@ export default function ConnectTest(): ReactElement {
     <>
       <div>
         <span>ID: </span>
-        <span>{task.id}</span>
+        <span>{task?.id}</span>
       </div>
       <div>
         <span>Text: </span>
-        <span>{task.text} </span>
+        <span>{task?.text} </span>
       </div>
       <div>
         <span>isFinished: </span>
-        <span>{task.isFinished?.toString()}</span>
+        <span>{task?.isFinished?.toString()}</span>
       </div>
     </>
   )
