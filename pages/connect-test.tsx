@@ -1,24 +1,28 @@
-import React, { ReactElement } from 'react'
-import { GetServerSideProps } from 'next'
-import { resolveApiPath } from '../apilib/ApiPathResolver'
+import React, { useState, useEffect, ReactElement } from 'react'
 
-export const getServerSideProps: GetServerSideProps = async () => {
+import { resolveApiPath } from '../libs/ApiPathResolver'
+
+const fetchData = async (): Promise<Task> => {
   const dataUrl = resolveApiPath('/api/connect-test')
   const data = await fetch(dataUrl).then((r) => r.json())
-  return {
-    props: {
-      data: data,
-    },
-  }
+  return data
 }
-interface task {
+interface Task {
   id: number
   text: string
   isFinished: boolean
 }
 
-export default function ConnectTest(props: { data: task }): ReactElement {
-  const task = props.data
+export default function ConnectTest(): ReactElement {
+  const [task, setTask] = useState({})
+  useEffect(() => {
+    const asyncWrap = async () => {
+      const task = await fetchData()
+      setTask(task)
+    }
+    asyncWrap()
+  }, setTask)
+
   return (
     <>
       <div>
@@ -31,7 +35,7 @@ export default function ConnectTest(props: { data: task }): ReactElement {
       </div>
       <div>
         <span>isFinished: </span>
-        <span>{task.isFinished.toString()}</span>
+        <span>{task.isFinished?.toString()}</span>
       </div>
     </>
   )
