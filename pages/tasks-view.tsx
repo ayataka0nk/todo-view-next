@@ -32,18 +32,34 @@ const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
     </>
   )
 }
+
 const UnFinishedItem = (props: {
   record: Task
   onFinish: (id: number) => void
+  onEdit: (task: Task) => void
+  onChange: (task: Task) => void
 }) => {
-  const { record, onFinish } = props
+  const [editing, setEditing] = useState(false)
+  const { record, onFinish, onEdit, onChange } = props
   const onFinishedClick = () => {
     onFinish(record.id)
+  }
+  const onEditStartClick = () => {
+    setEditing(true)
+  }
+  const onEditClickLocal = () => {
+    onEdit(record)
+    setEditing(false)
   }
   return (
     <div>
       <button onClick={onFinishedClick}>完了</button>
-      <span> {record.text}</span>
+      {editing || <span> {record.text}</span>}
+      {editing && (
+        <Textbox name="text" value={record.text} onChange={onChange} />
+      )}
+      {editing || <button onClick={onEditStartClick}>編集</button>}
+      {editing && <button onClick={onEditClickLocal}>決定</button>}
     </div>
   )
 }
@@ -69,6 +85,7 @@ const FinishedItem = function (props: {
     </div>
   )
 }
+
 /**分離予定 */
 const addTask = async (text: string) => {
   const data = {
@@ -84,6 +101,25 @@ const addTask = async (text: string) => {
   }
   const resJson = await fetch(urlTask, options).then((r) => r.json())
   return resJson
+}
+
+const updateTask = async (task: Task) => {
+  const urlTask = resolveApiPath('/api/tasks/' + task.id)
+  const options = {
+    method: 'PATCH',
+    body: JSON.stringify(task),
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+  }
+  const res = await fetch(urlTask, options)
+  if (res.status === 204) {
+    alert('更新成功')
+  } else if (res.status === 404) {
+    alert('リソースが存在しない')
+  } else {
+    alert('不明なエラー')
+  }
 }
 
 const removeTask = async (id: number) => {
@@ -132,6 +168,12 @@ export default function Todo(): JSX.Element {
     setData(data)
   }
 
+  const updateTaskClick = async (task: number): Promise<viod> => {
+    await updateTask(task)
+    const data = await fetchAllTasks()
+    setData(data)
+  }
+
   return (
     <>
       <h1>TODOLIST</h1>
@@ -145,6 +187,7 @@ export default function Todo(): JSX.Element {
               key={record.id}
               record={record}
               onFinish={toggleFinishState}
+              onEdit={updateTaskClick}
             />
           ))}
       </div>
