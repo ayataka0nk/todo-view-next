@@ -37,10 +37,10 @@ const UnFinishedItem = (props: {
   record: Task
   onFinish: (id: number) => void
   onEdit: (task: Task) => void
-  onChange: (task: Task) => void
+  onTaskChange: (task: Task) => void
 }) => {
   const [editing, setEditing] = useState(false)
-  const { record, onFinish, onEdit, onChange } = props
+  const { record, onFinish, onEdit, onTaskChange } = props
   const onFinishedClick = () => {
     onFinish(record.id)
   }
@@ -50,6 +50,9 @@ const UnFinishedItem = (props: {
   const onEditClickLocal = () => {
     onEdit(record)
     setEditing(false)
+  }
+  const onChange = (name: string, value: string) => {
+    onTaskChange(Object.assign(record, { text: value }))
   }
   return (
     <div>
@@ -168,10 +171,20 @@ export default function Todo(): JSX.Element {
     setData(data)
   }
 
-  const updateTaskClick = async (task: number): Promise<viod> => {
+  const updateTaskClick = async (task: Task): Promise<void> => {
     await updateTask(task)
     const data = await fetchAllTasks()
     setData(data)
+  }
+  const onTaskChange = async (task: Task): Promise<void> => {
+    const newData = data.map((record) => {
+      if (record['id'] === task.id) {
+        return task
+      } else {
+        return record
+      }
+    })
+    setData(newData)
   }
 
   return (
@@ -188,6 +201,7 @@ export default function Todo(): JSX.Element {
               record={record}
               onFinish={toggleFinishState}
               onEdit={updateTaskClick}
+              onTaskChange={onTaskChange}
             />
           ))}
       </div>
