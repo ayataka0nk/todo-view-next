@@ -51,16 +51,21 @@ const UnFinishedItem = (props: {
 const FinishedItem = function (props: {
   record: Task
   onUnFinish: (id: number) => void
+  onRemoveTaskClick: (id: number) => void
 }) {
-  const { record, onUnFinish } = props
+  const { record, onUnFinish, onRemoveTaskClick } = props
   const { id, text } = record
   const onUnFinishedClick = () => {
     onUnFinish(id)
   }
+  const onRemoveTaskClickLocal = () => {
+    onRemoveTaskClick(id)
+  }
   return (
     <div>
-      <button onClick={onUnFinishedClick}>未完了に戻す</button>
+      <button onClick={onRemoveTaskClickLocal}>削除</button>
       <span> {text} </span>
+      <button onClick={onUnFinishedClick}>未完了に戻す</button>
     </div>
   )
 }
@@ -79,6 +84,21 @@ const addTask = async (text: string) => {
   }
   const resJson = await fetch(urlTask, options).then((r) => r.json())
   return resJson
+}
+
+const removeTask = async (id: number) => {
+  const urlTask = resolveApiPath('/api/tasks/' + id)
+  const options = {
+    method: 'DELETE',
+  }
+  const res = await fetch(urlTask, options)
+  if (res.status === 204) {
+    alert('削除成功')
+  } else if (res.status === 404) {
+    alert('リソースが存在しない')
+  } else {
+    alert('不明なエラー')
+  }
 }
 
 export default function Todo(): JSX.Element {
@@ -102,6 +122,12 @@ export default function Todo(): JSX.Element {
   }
   const addTaskClick = async (text: string): Promise<void> => {
     await addTask(text)
+    const data = await fetchAllTasks()
+    setData(data)
+  }
+
+  const removeTaskClick = async (id: number): Promise<void> => {
+    await removeTask(id)
     const data = await fetchAllTasks()
     setData(data)
   }
@@ -132,6 +158,7 @@ export default function Todo(): JSX.Element {
                 key={record.id}
                 record={record}
                 onUnFinish={toggleFinishState}
+                onRemoveTaskClick={removeTaskClick}
               />
             )
           })}
