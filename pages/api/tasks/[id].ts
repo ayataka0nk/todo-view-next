@@ -10,7 +10,7 @@ export default (req: NextApiRequest, res: NextApiResponse): void => {
   if (method === 'GET') {
     const searchedTask = tasks.filter((task) => task.id === Number(id))
     res.status(200).json(searchedTask)
-  } else if (method === 'PUT') {
+  } else if (method === 'PATCH') {
     console.log('UPDATE EXECUTED')
     res.status(204).send('')
   } else if (method === 'DELETE') {
