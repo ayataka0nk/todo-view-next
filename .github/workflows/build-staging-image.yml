@@ -1,0 +1,21 @@
+name: Build Staging Image
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - name: Get the version
+        id: vars
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF#refs/heads/})
+      - name: Build the tagged Docker Image
+        run: docker build . --file Dockerfile --tag ayataka0nk/todo-view-next-stag:${{steps.vars.outputs.tag}} --target stag
+      - name: Push the tagged Docker image
+        run: docker push ayataka0nk/todo-view-next-stag:${{steps.vars.outputs.tag}}
