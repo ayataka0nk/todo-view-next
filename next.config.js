@@ -1,6 +1,6 @@
 const publicApiOrigin = () => {
   if (process.env.NODE_ENV === 'production') {
-    return 'http://118.27.0.46:8000'
+    return 'http://118.27.0.46:8090'
   } else if (process.env.NODE_ENV === 'staging') {
     return 'http://127.0.0.1:8090'
   } else {
