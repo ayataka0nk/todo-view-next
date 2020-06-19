@@ -102,8 +102,8 @@ const addTask = async (text: string) => {
       'Content-Type': 'application/json; charset=utf-8',
     },
   }
-  const resJson = await fetch(urlTask, options).then((r) => r.json())
-  return resJson
+  const res = await fetch(urlTask, options)
+  return res
 }
 
 const updateTask = async (task: Task) => {
