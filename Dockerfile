@@ -1,4 +1,5 @@
 FROM node:12-buster-slim as dev
+ENV NODE_ENV 'development'
 RUN apt-get update && apt-get install -y \
     git locales \
     && apt-get clean \
@@ -11,7 +12,19 @@ ENV LC_ALL ja_JP.UTF-8
 EXPOSE 3000
 CMD ["/bin/sh"]
 
+FROM node:12-buster-slim as stag
+ENV NODE_ENV 'production'
+ENV NODE_ENV_STAGING 'yes'
+COPY . /todo-view-next
+WORKDIR /todo-view-next
+RUN npm install --production
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "start"]
+
 FROM node:12-buster-slim as prod
+ENV NODE_ENV 'production'
+ENV NODE_ENV_STAGING 'no'
 COPY . /todo-view-next
 WORKDIR /todo-view-next
 RUN npm install --production
