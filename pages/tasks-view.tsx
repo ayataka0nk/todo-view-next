@@ -117,7 +117,7 @@ const updateTask = async (task: Task) => {
   }
   const res = await fetch(urlTask, options)
   if (res.status === 204) {
-    alert('更新成功')
+    console.log('更新成功')
   } else if (res.status === 404) {
     alert('リソースが存在しない')
   } else {
@@ -132,7 +132,7 @@ const removeTask = async (id: number) => {
   }
   const res = await fetch(urlTask, options)
   if (res.status === 204) {
-    alert('削除成功')
+    console.log('削除成功')
   } else if (res.status === 404) {
     alert('リソースが存在しない')
   } else {
