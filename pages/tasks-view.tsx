@@ -42,7 +42,7 @@ const UnFinishedItem = (props: {
   const [editing, setEditing] = useState(false)
   const { record, onFinish, onEdit, onTaskChange } = props
   const onFinishedClick = () => {
-    onFinish(record.id)
+    onFinish(record)
   }
   const onEditStartClick = () => {
     setEditing(true)
@@ -75,7 +75,7 @@ const FinishedItem = function (props: {
   const { record, onUnFinish, onRemoveTaskClick } = props
   const { id, text } = record
   const onUnFinishedClick = () => {
-    onUnFinish(id)
+    onUnFinish(record)
   }
   const onRemoveTaskClickLocal = () => {
     onRemoveTaskClick(id)
@@ -139,6 +139,10 @@ const removeTask = async (id: number) => {
     alert('不明なエラー')
   }
 }
+const toggleFinishState = async (task: Task): Promise<void> => {
+  const newTask = { ...task, isFinished: !task.isFinished }
+  await updateTask(newTask)
+}
 
 export default function Todo(): JSX.Element {
   const [data, setData] = useState<Task[]>([])
@@ -149,15 +153,10 @@ export default function Todo(): JSX.Element {
     }
     asyncWrap()
   }, [setData])
-  const toggleFinishState = (id: number): void => {
-    const newData = data.map((record) => {
-      if (record['id'] === id) {
-        return { ...record, isFinished: !record.isFinished }
-      } else {
-        return record
-      }
-    })
-    setData(newData)
+  const toggleFinishStateClick = async (task: Task): Promise<void> => {
+    await toggleFinishState(task)
+    const data = await fetchAllTasks()
+    setData(data)
   }
   const addTaskClick = async (text: string): Promise<void> => {
     await addTask(text)
@@ -199,7 +198,7 @@ export default function Todo(): JSX.Element {
             <UnFinishedItem
               key={record.id}
               record={record}
-              onFinish={toggleFinishState}
+              onFinish={toggleFinishStateClick}
               onEdit={updateTaskClick}
               onTaskChange={onTaskChange}
             />
@@ -214,7 +213,7 @@ export default function Todo(): JSX.Element {
               <FinishedItem
                 key={record.id}
                 record={record}
-                onUnFinish={toggleFinishState}
+                onUnFinish={toggleFinishStateClick}
                 onRemoveTaskClick={removeTaskClick}
               />
             )
