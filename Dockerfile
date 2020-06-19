@@ -13,8 +13,7 @@ EXPOSE 3000
 CMD ["/bin/sh"]
 
 FROM node:12-buster-slim as stag
-ENV NODE_ENV 'production'
-ENV NODE_ENV_STAGING 'yes'
+ENV NODE_ENV 'staging'
 COPY . /todo-view-next
 WORKDIR /todo-view-next
 RUN npm install --production
@@ -24,7 +23,6 @@ CMD ["npm", "run", "start"]
 
 FROM node:12-buster-slim as prod
 ENV NODE_ENV 'production'
-ENV NODE_ENV_STAGING 'no'
 COPY . /todo-view-next
 WORKDIR /todo-view-next
 RUN npm install --production
