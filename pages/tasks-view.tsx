@@ -35,7 +35,7 @@ const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
 
 const UnFinishedItem = (props: {
   record: Task
-  onFinish: (id: number) => void
+  onFinish: (task: Task) => void
   onEdit: (task: Task) => void
   onTaskChange: (task: Task) => void
 }) => {
@@ -69,7 +69,7 @@ const UnFinishedItem = (props: {
 
 const FinishedItem = function (props: {
   record: Task
-  onUnFinish: (id: number) => void
+  onUnFinish: (task: Task) => void
   onRemoveTaskClick: (id: number) => void
 }) {
   const { record, onUnFinish, onRemoveTaskClick } = props
