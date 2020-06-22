@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Textbox } from '../components/Textbox'
 import { Task, TaskType } from '../model/Task'
+import { useTasks } from '../hooks/TasksHook'
 
 const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   const { onAdd } = props
@@ -76,96 +77,91 @@ const FinishedItem = function (props: {
   )
 }
 
-const toggleFinishState = async (task: TaskType): Promise<void> => {
-  const newTask = { ...task, isFinished: !task.isFinished }
-  const res = await Task.update(newTask)
-  if (res.status === 204) {
-    console.log('更新成功')
-  } else if (res.status === 404) {
-    alert('リソースが存在しない')
-  } else {
-    alert('不明なエラー')
-  }
-}
-
 export default function Todo(): JSX.Element {
-  const [data, setData] = useState<TaskType[]>([])
-  useEffect(() => {
-    const asyncWrap = async () => {
-      const tasks = await Task.fetchAll()
-      setData(tasks)
+  const {
+    tasks,
+    updateLocal,
+    add,
+    remove,
+    update,
+    toggleFinishState,
+  } = useTasks()
+
+  const onToggleFinishStateClick = async (task: TaskType): Promise<void> => {
+    const res = await toggleFinishState(task)
+    if (res.status === 204) {
+      console.log('更新成功')
+    } else if (res.status === 404) {
+      alert('更新: リソースが存在しない')
+    } else {
+      alert('更新: 不明なエラー')
     }
-    asyncWrap()
-  }, [setData])
-  const toggleFinishStateClick = async (task: TaskType): Promise<void> => {
-    await toggleFinishState(task)
-    const data = await Task.fetchAll()
-    setData(data)
-  }
-  const addTaskClick = async (text: string): Promise<void> => {
-    await Task.add(text)
-    const data = await Task.fetchAll()
-    setData(data)
   }
 
-  const removeTaskClick = async (id: number): Promise<void> => {
-    const res = await Task.remove(id)
+  const onAddTaskClick = async (text: string): Promise<void> => {
+    const res = await add(text)
+    if (res.status === 201) {
+      console.log('登録成功')
+    } else {
+      alert('登録: 不明なエラー')
+    }
+  }
+
+  const onRemoveTaskClick = async (id: number): Promise<void> => {
+    const res = await remove(id)
     if (res.status === 204) {
       console.log('削除成功')
     } else if (res.status === 404) {
-      alert('リソースが存在しない')
+      alert('削除: リソースが存在しない')
     } else {
-      alert('不明なエラー')
+      alert('削除: 不明なエラー')
     }
-    const data = await Task.fetchAll()
-    setData(data)
   }
 
-  const updateTaskClick = async (task: TaskType): Promise<void> => {
-    await Task.update(task)
-    const data = await Task.fetchAll()
-    setData(data)
+  const onUpdateTaskClick = async (task: TaskType) => {
+    const res = await update(task)
+    if (res.status === 204) {
+      console.log('更新成功')
+    } else if (res.status === 404) {
+      alert('更新: リソースが存在しない')
+    } else {
+      alert('更新: 不明なエラー')
+    }
   }
+
   const onTaskChange = async (task: TaskType): Promise<void> => {
-    const newData = data.map((record) => {
-      if (record['id'] === task.id) {
-        return task
-      } else {
-        return record
-      }
-    })
-    setData(newData)
+    updateLocal(task)
   }
 
   return (
     <>
       <h1>TODOLIST</h1>
-      <TaskAddForm onAdd={addTaskClick} />
+      <TaskAddForm onAdd={onAddTaskClick} />
       <h2>未完了</h2>
       <div>
-        {data
+        {tasks
           .filter((record) => record.isFinished === false)
           .map((record) => (
             <UnFinishedItem
               key={record.id}
               record={record}
-              onFinish={toggleFinishStateClick}
-              onEdit={updateTaskClick}
+              onFinish={onToggleFinishStateClick}
+              onEdit={onUpdateTaskClick}
               onTaskChange={onTaskChange}
             />
           ))}
       </div>
       <h2>完了</h2>
       <div>
-        {data
-          .filter((rec) => rec.isFinished === true)
-          .map((record) => {
+        {tasks
+          .filter((task) => task.isFinished === true)
+          .map((task) => {
             return (
               <FinishedItem
-                key={record.id}
-                record={record}
-                onUnFinish={toggleFinishStateClick}
-                onRemoveTaskClick={removeTaskClick}
+                key={task.id}
+                record={task}
+                onUnFinish={onToggleFinishStateClick}
+                onRemoveTaskClick={onRemoveTaskClick}
               />
             )
           })}
