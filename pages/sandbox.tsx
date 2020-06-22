@@ -1,24 +1,20 @@
 import React, { useState } from 'react'
-import { Checkbox } from '../components/Checkbox'
-import { Textbox } from '../components/Textbox'
+import { Button } from '../components/Button'
+import { EditableTextType, EditableText } from '../components/EditableText'
 
-const Sandbox = (): JSX.Element => {
-  const [checkboxValue, setCheckboxValue] = useState(false)
-  const onCheckboxChange = (name: string, value: boolean) => {
-    setCheckboxValue(value)
-  }
-  const [textboxValue, setTextboxValue] = useState('')
-  const onTextboxChange = (name: string, value: string) => {
-    setTextboxValue(value)
+const Sandbox: React.FC = () => {
+  const [text, setText] = useState('default')
+  const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setText(event.target.value)
   }
   return (
     <>
-      <Checkbox
-        name="testbox"
-        value={checkboxValue}
-        onChange={onCheckboxChange}
-      />
-      <Textbox name="textbox" value={textboxValue} onChange={onTextboxChange} />
+      <Button styleType="decision">Decision</Button>
+      <Button styleType="cancel">Cancel</Button>
+      <Button styleType="decision">決定</Button>
+      <Button styleType="cancel">キャンセル</Button>
+      <EditableText name="editableText" value={text} onChange={onTextChange} />
+      <EditableText name="editableText2" value={text} onChange={onTextChange} />
     </>
   )
 }
