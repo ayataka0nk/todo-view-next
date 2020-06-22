@@ -35,13 +35,14 @@ const TaskItem = (props: {
     onEditEnd(task)
   }
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (name: string, value: string | boolean) => {
     const newTask = Object.assign(task)
-    newTask[event.target.name] = event.target.value
+    newTask[name] = value
     onTaskChange(newTask)
   }
-  const onChangeWithSave = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event)
+
+  const handleChangeWithSave = (name: string, value: boolean) => {
+    handleChange(name, value)
     onEditEnd(task)
   }
   const onRemoveClickLocal = () => {
@@ -53,14 +54,14 @@ const TaskItem = (props: {
         <Checkbox
           name="isFinished"
           value={task.isFinished}
-          onChange={onChangeWithSave}
+          handleChange={handleChangeWithSave}
         />
       </div>
       <div className="text">
         <EditableText
           name="text"
           value={task.text}
-          onChange={onChange}
+          handleChange={handleChange}
           onEditEnd={onEditEndLocal}
         />
       </div>

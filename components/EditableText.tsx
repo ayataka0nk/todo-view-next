@@ -3,12 +3,13 @@ import React, { useState, useRef, useEffect } from 'react'
 export type EditableTextType = {
   name: string
   value: string
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  handleChange?: (name: string, value: string) => void
   onEditStart?: () => void
   onEditEnd?: () => void
 }
 export const EditableText: React.FC<EditableTextType> = (props) => {
-  const { name, value, onChange, onEditStart, onEditEnd } = props
+  const { name, value, onChange, onEditStart, onEditEnd, handleChange } = props
   const [editting, setEditting] = useState(false)
   const inputTextRef = useRef<HTMLInputElement>(null)
   const onDisplayTextClick = () => {
@@ -18,6 +19,10 @@ export const EditableText: React.FC<EditableTextType> = (props) => {
   const onBlurEdittingText = () => {
     onEditEnd && onEditEnd()
     setEditting(false)
+  }
+  const onChangeLocal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange && onChange(event)
+    handleChange && handleChange(event.target.name, event.target.value)
   }
 
   useEffect(() => {
@@ -33,7 +38,7 @@ export const EditableText: React.FC<EditableTextType> = (props) => {
         ref={inputTextRef}
         name={name}
         value={value}
-        onChange={onChange}
+        onChange={onChangeLocal}
         onBlur={onBlurEdittingText}
       />
       <style jsx>
