@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Textbox } from '../components/Textbox'
-import { resolveApiPath } from '../libs/ApiPathResolver'
-
-type Task = {
-  id: number
-  text: string
-  isFinished: boolean
-}
-
-const fetchAllTasks = async (): Promise<Task[]> => {
-  console.log('fetch called')
-  const dataUrl = resolveApiPath('/api/tasks')
-  const tasks = await fetch(dataUrl).then((r) => r.json())
-  return tasks
-}
+import { Task, TaskType } from '../model/Task'
+import { useTasks } from '../hooks/TasksHook'
+import { Checkbox } from '../components/Checkbox'
+import { EditableText } from '../components/EditableText'
 
 const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   const { onAdd } = props
@@ -33,192 +23,153 @@ const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   )
 }
 
-const UnFinishedItem = (props: {
-  record: Task
-  onFinish: (task: Task) => void
-  onEdit: (task: Task) => void
-  onTaskChange: (task: Task) => void
+const TaskItem = (props: {
+  task: TaskType
+  editting: boolean
+  setEditting: (id: number | null) => void
+  onEditEnd: (task: TaskType) => void
+  onTaskChange: (task: TaskType) => void
+  onRemoveClick: (id: number) => void
 }) => {
-  const [editing, setEditing] = useState(false)
-  const { record, onFinish, onEdit, onTaskChange } = props
-  const onFinishedClick = () => {
-    onFinish(record)
+  const {
+    task,
+    editting,
+    setEditting,
+    onEditEnd,
+    onTaskChange,
+    onRemoveClick,
+  } = props
+
+  const onEditEndLocal = () => {
+    onEditEnd(task)
   }
-  const onEditStartClick = () => {
-    setEditing(true)
+
+  const handleChange = (name: string, value: string | boolean) => {
+    const newTask = Object.assign(task)
+    newTask[name] = value
+    onTaskChange(newTask)
   }
-  const onEditClickLocal = () => {
-    onEdit(record)
-    setEditing(false)
+
+  const handleChangeWithSave = (name: string, value: boolean) => {
+    handleChange(name, value)
+    onEditEnd(task)
   }
-  const onChange = (name: string, value: string) => {
-    onTaskChange(Object.assign(record, { text: value }))
+  const onRemoveClickLocal = () => {
+    onRemoveClick(task.id)
   }
   return (
-    <div>
-      <button onClick={onFinishedClick}>完了</button>
-      {editing || <span> {record.text}</span>}
-      {editing && (
-        <Textbox name="text" value={record.text} onChange={onChange} />
-      )}
-      {editing || <button onClick={onEditStartClick}>編集</button>}
-      {editing && <button onClick={onEditClickLocal}>決定</button>}
+    <div
+      className="columns"
+      onDoubleClick={() => setEditting(task.id)}
+      onBlur={() => setEditting(null)}
+    >
+      <div className="is-finished">
+        <Checkbox
+          name="isFinished"
+          value={task.isFinished}
+          handleChange={handleChangeWithSave}
+        />
+      </div>
+      <div className="text">
+        <EditableText
+          name="text"
+          editting={editting}
+          value={task.text}
+          handleChange={handleChange}
+          onEditEnd={onEditEndLocal}
+        />
+      </div>
+      <div className="delete-button">
+        <button onClick={onRemoveClickLocal}>削除</button>
+      </div>
+
+      <style jsx>{`
+        div {
+        }
+        .columns {
+          display: flex;
+          width: 400px;
+        }
+        .columns > .is-finished {
+          width: 20px;
+        }
+        .columns > .text {
+          flex: 1;
+          padding: 0px 10px;
+        }
+        .columns > .delete-button {
+          width: 50px;
+        }
+      `}</style>
     </div>
   )
-}
-
-const FinishedItem = function (props: {
-  record: Task
-  onUnFinish: (task: Task) => void
-  onRemoveTaskClick: (id: number) => void
-}) {
-  const { record, onUnFinish, onRemoveTaskClick } = props
-  const { id, text } = record
-  const onUnFinishedClick = () => {
-    onUnFinish(record)
-  }
-  const onRemoveTaskClickLocal = () => {
-    onRemoveTaskClick(id)
-  }
-  return (
-    <div>
-      <button onClick={onRemoveTaskClickLocal}>削除</button>
-      <span> {text} </span>
-      <button onClick={onUnFinishedClick}>未完了に戻す</button>
-    </div>
-  )
-}
-
-/**分離予定 */
-const addTask = async (text: string) => {
-  const data = {
-    text: text,
-  }
-  const urlTask = resolveApiPath('/api/tasks')
-  const options = {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  }
-  const res = await fetch(urlTask, options)
-  return res
-}
-
-const updateTask = async (task: Task) => {
-  const urlTask = resolveApiPath('/api/tasks/' + task.id)
-  const options = {
-    method: 'PATCH',
-    body: JSON.stringify(task),
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  }
-  const res = await fetch(urlTask, options)
-  if (res.status === 204) {
-    console.log('更新成功')
-  } else if (res.status === 404) {
-    alert('リソースが存在しない')
-  } else {
-    alert('不明なエラー')
-  }
-}
-
-const removeTask = async (id: number) => {
-  const urlTask = resolveApiPath('/api/tasks/' + id)
-  const options = {
-    method: 'DELETE',
-  }
-  const res = await fetch(urlTask, options)
-  if (res.status === 204) {
-    console.log('削除成功')
-  } else if (res.status === 404) {
-    alert('リソースが存在しない')
-  } else {
-    alert('不明なエラー')
-  }
-}
-const toggleFinishState = async (task: Task): Promise<void> => {
-  const newTask = { ...task, isFinished: !task.isFinished }
-  await updateTask(newTask)
 }
 
 export default function Todo(): JSX.Element {
-  const [data, setData] = useState<Task[]>([])
-  useEffect(() => {
-    const asyncWrap = async () => {
-      const tasks = await fetchAllTasks()
-      setData(tasks)
+  const { tasks, updateLocal, add, remove, update } = useTasks()
+  const [editting, setEditting] = useState<number | null>(null)
+  const onAddTaskClick = async (text: string): Promise<void> => {
+    const res = await add(text)
+    if (res.status === 201) {
+      console.log('登録成功')
+    } else {
+      alert('登録: 不明なエラー')
     }
-    asyncWrap()
-  }, [setData])
-  const toggleFinishStateClick = async (task: Task): Promise<void> => {
-    await toggleFinishState(task)
-    const data = await fetchAllTasks()
-    setData(data)
-  }
-  const addTaskClick = async (text: string): Promise<void> => {
-    await addTask(text)
-    const data = await fetchAllTasks()
-    setData(data)
   }
 
-  const removeTaskClick = async (id: number): Promise<void> => {
-    await removeTask(id)
-    const data = await fetchAllTasks()
-    setData(data)
+  const onRemoveTaskClick = async (id: number): Promise<void> => {
+    const res = await remove(id)
+    if (res.status === 204) {
+      console.log('削除成功')
+    } else if (res.status === 404) {
+      alert('削除: リソースが存在しない')
+    } else {
+      alert('削除: 不明なエラー')
+    }
   }
 
-  const updateTaskClick = async (task: Task): Promise<void> => {
-    await updateTask(task)
-    const data = await fetchAllTasks()
-    setData(data)
+  const onUpdateTaskClick = async (task: TaskType) => {
+    const res = await update(task)
+    if (res.status === 204) {
+      console.log('更新成功')
+    } else if (res.status === 404) {
+      alert('更新: リソースが存在しない')
+    } else {
+      alert('更新: 不明なエラー')
+    }
   }
-  const onTaskChange = async (task: Task): Promise<void> => {
-    const newData = data.map((record) => {
-      if (record['id'] === task.id) {
-        return task
-      } else {
-        return record
-      }
-    })
-    setData(newData)
+
+  const onTaskChange = async (task: TaskType): Promise<void> => {
+    updateLocal(task)
+  }
+  const FilteredTasks: React.FC<{ isFinished: boolean }> = (props) => {
+    return (
+      <div>
+        {tasks
+          .filter((task) => task.isFinished === props.isFinished)
+          .map((task, index) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              editting={editting === task.id}
+              setEditting={setEditting}
+              onEditEnd={onUpdateTaskClick}
+              onTaskChange={onTaskChange}
+              onRemoveClick={onRemoveTaskClick}
+            />
+          ))}
+      </div>
+    )
   }
 
   return (
     <>
       <h1>TODOLIST</h1>
-      <TaskAddForm onAdd={addTaskClick} />
+      <TaskAddForm onAdd={onAddTaskClick} />
       <h2>未完了</h2>
-      <div>
-        {data
-          .filter((record) => record.isFinished === false)
-          .map((record) => (
-            <UnFinishedItem
-              key={record.id}
-              record={record}
-              onFinish={toggleFinishStateClick}
-              onEdit={updateTaskClick}
-              onTaskChange={onTaskChange}
-            />
-          ))}
-      </div>
+      <FilteredTasks isFinished={false} />
       <h2>完了</h2>
-      <div>
-        {data
-          .filter((rec) => rec.isFinished === true)
-          .map((record) => {
-            return (
-              <FinishedItem
-                key={record.id}
-                record={record}
-                onUnFinish={toggleFinishStateClick}
-                onRemoveTaskClick={removeTaskClick}
-              />
-            )
-          })}
-      </div>
+      <FilteredTasks isFinished={true} />
     </>
   )
 }
