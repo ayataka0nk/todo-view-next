@@ -102,15 +102,11 @@ export default function Todo(): JSX.Element {
   const onTaskChange = async (task: TaskType): Promise<void> => {
     updateLocal(task)
   }
-
-  return (
-    <>
-      <h1>TODOLIST</h1>
-      <TaskAddForm onAdd={onAddTaskClick} />
-      <h2>未完了</h2>
+  const FilteredTasks: React.FC<{ isFinished: boolean }> = (props) => {
+    return (
       <div>
         {tasks
-          .filter((record) => record.isFinished === false)
+          .filter((record) => record.isFinished === props.isFinished)
           .map((record) => (
             <TaskItem
               key={record.id}
@@ -121,22 +117,17 @@ export default function Todo(): JSX.Element {
             />
           ))}
       </div>
+    )
+  }
+
+  return (
+    <>
+      <h1>TODOLIST</h1>
+      <TaskAddForm onAdd={onAddTaskClick} />
+      <h2>未完了</h2>
+      <FilteredTasks isFinished={false} />
       <h2>完了</h2>
-      <div>
-        {tasks
-          .filter((task) => task.isFinished === true)
-          .map((task) => {
-            return (
-              <TaskItem
-                key={task.id}
-                record={task}
-                onEditEnd={onUpdateTaskClick}
-                onTaskChange={onTaskChange}
-                onRemoveClick={onRemoveTaskClick}
-              />
-            )
-          })}
-      </div>
+      <FilteredTasks isFinished={true} />
     </>
   )
 }
