@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Textbox } from '../components/Textbox'
 import { Task, TaskType } from '../model/Task'
 import { useTasks } from '../hooks/TasksHook'
+import { Checkbox } from '../components/Checkbox'
+import { EditableText } from '../components/EditableText'
 
 const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   const { onAdd } = props
@@ -21,58 +23,44 @@ const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   )
 }
 
-const UnFinishedItem = (props: {
+const TaskItem = (props: {
   record: TaskType
-  onFinish: (task: TaskType) => void
-  onEdit: (task: TaskType) => void
+  onEditEnd: (task: TaskType) => void
   onTaskChange: (task: TaskType) => void
+  onRemoveClick: (id: number) => void
 }) => {
-  const [editing, setEditing] = useState(false)
-  const { record, onFinish, onEdit, onTaskChange } = props
-  const onFinishedClick = () => {
-    onFinish(record)
-  }
-  const onEditStartClick = () => {
-    setEditing(true)
-  }
-  const onEditClickLocal = () => {
-    onEdit(record)
-    setEditing(false)
-  }
-  const onChange = (name: string, value: string) => {
-    onTaskChange(Object.assign(record, { text: value }))
-  }
-  return (
-    <div>
-      <button onClick={onFinishedClick}>完了</button>
-      {editing || <span> {record.text}</span>}
-      {editing && (
-        <Textbox name="text" value={record.text} onChange={onChange} />
-      )}
-      {editing || <button onClick={onEditStartClick}>編集</button>}
-      {editing && <button onClick={onEditClickLocal}>決定</button>}
-    </div>
-  )
-}
+  const { record, onEditEnd, onTaskChange, onRemoveClick } = props
 
-const FinishedItem = function (props: {
-  record: TaskType
-  onUnFinish: (task: TaskType) => void
-  onRemoveTaskClick: (id: number) => void
-}) {
-  const { record, onUnFinish, onRemoveTaskClick } = props
-  const { id, text } = record
-  const onUnFinishedClick = () => {
-    onUnFinish(record)
+  const onEditEndLocal = () => {
+    onEditEnd(record)
   }
-  const onRemoveTaskClickLocal = () => {
-    onRemoveTaskClick(id)
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newTask = Object.assign(record)
+    newTask[event.target.name] = event.target.value
+    onTaskChange(newTask)
+  }
+  const onChangeWithSave = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event)
+    onEditEnd(record)
+  }
+  const onRemoveClickLocal = () => {
+    onRemoveClick(record.id)
   }
   return (
     <div>
-      <button onClick={onRemoveTaskClickLocal}>削除</button>
-      <span> {text} </span>
-      <button onClick={onUnFinishedClick}>未完了に戻す</button>
+      <Checkbox
+        name="isFinished"
+        value={record.isFinished}
+        onChange={onChangeWithSave}
+      />
+      <EditableText
+        name="text"
+        value={record.text}
+        onChange={onChange}
+        onEditEnd={onEditEndLocal}
+      />
+      <button onClick={onRemoveClickLocal}>削除</button>
     </div>
   )
 }
@@ -86,17 +74,6 @@ export default function Todo(): JSX.Element {
     update,
     toggleFinishState,
   } = useTasks()
-
-  const onToggleFinishStateClick = async (task: TaskType): Promise<void> => {
-    const res = await toggleFinishState(task)
-    if (res.status === 204) {
-      console.log('更新成功')
-    } else if (res.status === 404) {
-      alert('更新: リソースが存在しない')
-    } else {
-      alert('更新: 不明なエラー')
-    }
-  }
 
   const onAddTaskClick = async (text: string): Promise<void> => {
     const res = await add(text)
@@ -142,12 +119,12 @@ export default function Todo(): JSX.Element {
         {tasks
           .filter((record) => record.isFinished === false)
           .map((record) => (
-            <UnFinishedItem
+            <TaskItem
               key={record.id}
               record={record}
-              onFinish={onToggleFinishStateClick}
-              onEdit={onUpdateTaskClick}
+              onEditEnd={onUpdateTaskClick}
               onTaskChange={onTaskChange}
+              onRemoveClick={onRemoveTaskClick}
             />
           ))}
       </div>
@@ -157,11 +134,12 @@ export default function Todo(): JSX.Element {
           .filter((task) => task.isFinished === true)
           .map((task) => {
             return (
-              <FinishedItem
+              <TaskItem
                 key={task.id}
                 record={task}
-                onUnFinish={onToggleFinishStateClick}
-                onRemoveTaskClick={onRemoveTaskClick}
+                onEditEnd={onUpdateTaskClick}
+                onTaskChange={onTaskChange}
+                onRemoveClick={onRemoveTaskClick}
               />
             )
           })}
