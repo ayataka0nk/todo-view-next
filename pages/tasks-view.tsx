@@ -66,14 +66,7 @@ const TaskItem = (props: {
 }
 
 export default function Todo(): JSX.Element {
-  const {
-    tasks,
-    updateLocal,
-    add,
-    remove,
-    update,
-    toggleFinishState,
-  } = useTasks()
+  const { tasks, updateLocal, add, remove, update } = useTasks()
 
   const onAddTaskClick = async (text: string): Promise<void> => {
     const res = await add(text)
