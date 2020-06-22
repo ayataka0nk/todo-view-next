@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Textbox } from '../components/Textbox'
-import { resolveApiPath } from '../libs/ApiPathResolver'
-
-type Task = {
-  id: number
-  text: string
-  isFinished: boolean
-}
-
-const fetchAllTasks = async (): Promise<Task[]> => {
-  console.log('fetch called')
-  const dataUrl = resolveApiPath('/api/tasks')
-  const tasks = await fetch(dataUrl).then((r) => r.json())
-  return tasks
-}
+import { Task, TaskType } from '../model/Task'
 
 const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   const { onAdd } = props
@@ -34,10 +21,10 @@ const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
 }
 
 const UnFinishedItem = (props: {
-  record: Task
-  onFinish: (task: Task) => void
-  onEdit: (task: Task) => void
-  onTaskChange: (task: Task) => void
+  record: TaskType
+  onFinish: (task: TaskType) => void
+  onEdit: (task: TaskType) => void
+  onTaskChange: (task: TaskType) => void
 }) => {
   const [editing, setEditing] = useState(false)
   const { record, onFinish, onEdit, onTaskChange } = props
@@ -68,8 +55,8 @@ const UnFinishedItem = (props: {
 }
 
 const FinishedItem = function (props: {
-  record: Task
-  onUnFinish: (task: Task) => void
+  record: TaskType
+  onUnFinish: (task: TaskType) => void
   onRemoveTaskClick: (id: number) => void
 }) {
   const { record, onUnFinish, onRemoveTaskClick } = props
@@ -89,33 +76,9 @@ const FinishedItem = function (props: {
   )
 }
 
-/**分離予定 */
-const addTask = async (text: string) => {
-  const data = {
-    text: text,
-  }
-  const urlTask = resolveApiPath('/api/tasks')
-  const options = {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  }
-  const res = await fetch(urlTask, options)
-  return res
-}
-
-const updateTask = async (task: Task) => {
-  const urlTask = resolveApiPath('/api/tasks/' + task.id)
-  const options = {
-    method: 'PATCH',
-    body: JSON.stringify(task),
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  }
-  const res = await fetch(urlTask, options)
+const toggleFinishState = async (task: TaskType): Promise<void> => {
+  const newTask = { ...task, isFinished: !task.isFinished }
+  const res = await Task.update(newTask)
   if (res.status === 204) {
     console.log('更新成功')
   } else if (res.status === 404) {
@@ -125,57 +88,45 @@ const updateTask = async (task: Task) => {
   }
 }
 
-const removeTask = async (id: number) => {
-  const urlTask = resolveApiPath('/api/tasks/' + id)
-  const options = {
-    method: 'DELETE',
-  }
-  const res = await fetch(urlTask, options)
-  if (res.status === 204) {
-    console.log('削除成功')
-  } else if (res.status === 404) {
-    alert('リソースが存在しない')
-  } else {
-    alert('不明なエラー')
-  }
-}
-const toggleFinishState = async (task: Task): Promise<void> => {
-  const newTask = { ...task, isFinished: !task.isFinished }
-  await updateTask(newTask)
-}
-
 export default function Todo(): JSX.Element {
-  const [data, setData] = useState<Task[]>([])
+  const [data, setData] = useState<TaskType[]>([])
   useEffect(() => {
     const asyncWrap = async () => {
-      const tasks = await fetchAllTasks()
+      const tasks = await Task.fetchAll()
       setData(tasks)
     }
     asyncWrap()
   }, [setData])
-  const toggleFinishStateClick = async (task: Task): Promise<void> => {
+  const toggleFinishStateClick = async (task: TaskType): Promise<void> => {
     await toggleFinishState(task)
-    const data = await fetchAllTasks()
+    const data = await Task.fetchAll()
     setData(data)
   }
   const addTaskClick = async (text: string): Promise<void> => {
-    await addTask(text)
-    const data = await fetchAllTasks()
+    await Task.add(text)
+    const data = await Task.fetchAll()
     setData(data)
   }
 
   const removeTaskClick = async (id: number): Promise<void> => {
-    await removeTask(id)
-    const data = await fetchAllTasks()
+    const res = await Task.remove(id)
+    if (res.status === 204) {
+      console.log('削除成功')
+    } else if (res.status === 404) {
+      alert('リソースが存在しない')
+    } else {
+      alert('不明なエラー')
+    }
+    const data = await Task.fetchAll()
     setData(data)
   }
 
-  const updateTaskClick = async (task: Task): Promise<void> => {
-    await updateTask(task)
-    const data = await fetchAllTasks()
+  const updateTaskClick = async (task: TaskType): Promise<void> => {
+    await Task.update(task)
+    const data = await Task.fetchAll()
     setData(data)
   }
-  const onTaskChange = async (task: Task): Promise<void> => {
+  const onTaskChange = async (task: TaskType): Promise<void> => {
     const newData = data.map((record) => {
       if (record['id'] === task.id) {
         return task
