@@ -24,39 +24,39 @@ const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
 }
 
 const TaskItem = (props: {
-  record: TaskType
+  task: TaskType
   onEditEnd: (task: TaskType) => void
   onTaskChange: (task: TaskType) => void
   onRemoveClick: (id: number) => void
 }) => {
-  const { record, onEditEnd, onTaskChange, onRemoveClick } = props
+  const { task, onEditEnd, onTaskChange, onRemoveClick } = props
 
   const onEditEndLocal = () => {
-    onEditEnd(record)
+    onEditEnd(task)
   }
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newTask = Object.assign(record)
+    const newTask = Object.assign(task)
     newTask[event.target.name] = event.target.value
     onTaskChange(newTask)
   }
   const onChangeWithSave = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event)
-    onEditEnd(record)
+    onEditEnd(task)
   }
   const onRemoveClickLocal = () => {
-    onRemoveClick(record.id)
+    onRemoveClick(task.id)
   }
   return (
     <div>
       <Checkbox
         name="isFinished"
-        value={record.isFinished}
+        value={task.isFinished}
         onChange={onChangeWithSave}
       />
       <EditableText
         name="text"
-        value={record.text}
+        value={task.text}
         onChange={onChange}
         onEditEnd={onEditEndLocal}
       />
@@ -106,11 +106,11 @@ export default function Todo(): JSX.Element {
     return (
       <div>
         {tasks
-          .filter((record) => record.isFinished === props.isFinished)
-          .map((record) => (
+          .filter((task) => task.isFinished === props.isFinished)
+          .map((task) => (
             <TaskItem
-              key={record.id}
-              record={record}
+              key={task.id}
+              task={task}
               onEditEnd={onUpdateTaskClick}
               onTaskChange={onTaskChange}
               onRemoveClick={onRemoveTaskClick}
