@@ -48,19 +48,44 @@ const TaskItem = (props: {
     onRemoveClick(task.id)
   }
   return (
-    <div>
-      <Checkbox
-        name="isFinished"
-        value={task.isFinished}
-        onChange={onChangeWithSave}
-      />
-      <EditableText
-        name="text"
-        value={task.text}
-        onChange={onChange}
-        onEditEnd={onEditEndLocal}
-      />
-      <button onClick={onRemoveClickLocal}>削除</button>
+    <div className="columns">
+      <div className="is-finished">
+        <Checkbox
+          name="isFinished"
+          value={task.isFinished}
+          onChange={onChangeWithSave}
+        />
+      </div>
+      <div className="text">
+        <EditableText
+          name="text"
+          value={task.text}
+          onChange={onChange}
+          onEditEnd={onEditEndLocal}
+        />
+      </div>
+      <div className="delete-button">
+        <button onClick={onRemoveClickLocal}>削除</button>
+      </div>
+
+      <style jsx>{`
+        div {
+        }
+        .columns {
+          display: flex;
+          width: 400px;
+        }
+        .columns > .is-finished {
+          width: 20px;
+        }
+        .columns > .text {
+          flex: 1;
+          padding: 0px 10px;
+        }
+        .columns > .delete-button {
+          width: 50px;
+        }
+      `}</style>
     </div>
   )
 }
