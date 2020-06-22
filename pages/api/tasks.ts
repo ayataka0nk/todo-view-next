@@ -11,6 +11,11 @@ export const tasks = [
     text: '起きる',
     isFinished: false,
   },
+  {
+    id: 3,
+    text: 'うおおおおあああああああああああああああああああああ',
+    isFinished: false,
+  },
 ]
 const failed = false
 

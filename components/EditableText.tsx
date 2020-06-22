@@ -28,13 +28,22 @@ export const EditableText: React.FC<EditableTextType> = (props) => {
   }, [editting])
 
   const EdittingText = (
-    <input
-      ref={inputTextRef}
-      name={name}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlurEdittingText}
-    />
+    <>
+      <input
+        ref={inputTextRef}
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlurEdittingText}
+      />
+      <style jsx>
+        {`
+          input {
+            width: 100%;
+          }
+        `}
+      </style>
+    </>
   )
   const DisplayText = <span onClick={onDisplayTextClick}>{value}</span>
   return editting ? EdittingText : DisplayText
