@@ -105,6 +105,36 @@ const TaskItem = (props: {
   )
 }
 
+type FilteredTasksProps = {
+  tasks: TaskType[]
+  isFinished: boolean
+  editting: number | null
+  setEditting: (id: number | null) => void
+  onUpdateTaskClick: (task: TaskType) => void
+  onTaskChange: (task: TaskType) => void
+  onRemoveClick: (id: number) => void
+}
+
+const FilteredTasks: React.FC<FilteredTasksProps> = (props) => {
+  return (
+    <div>
+      {props.tasks
+        .filter((task) => task.isFinished === props.isFinished)
+        .map((task, index) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            editting={props.editting === task.id}
+            setEditting={props.setEditting}
+            onEditEnd={props.onUpdateTaskClick}
+            onTaskChange={props.onTaskChange}
+            onRemoveClick={props.onRemoveClick}
+          />
+        ))}
+    </div>
+  )
+}
+
 export default function Todo(): JSX.Element {
   const { tasks, updateLocal, add, remove, update } = useTasks()
   const [editting, setEditting] = useState<number | null>(null)
@@ -142,34 +172,31 @@ export default function Todo(): JSX.Element {
   const onTaskChange = async (task: TaskType): Promise<void> => {
     updateLocal(task)
   }
-  const FilteredTasks: React.FC<{ isFinished: boolean }> = (props) => {
-    return (
-      <div>
-        {tasks
-          .filter((task) => task.isFinished === props.isFinished)
-          .map((task, index) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              editting={editting === task.id}
-              setEditting={setEditting}
-              onEditEnd={onUpdateTaskClick}
-              onTaskChange={onTaskChange}
-              onRemoveClick={onRemoveTaskClick}
-            />
-          ))}
-      </div>
-    )
-  }
 
   return (
     <>
       <h1>TODOLIST</h1>
       <TaskAddForm onAdd={onAddTaskClick} />
       <h2>未完了</h2>
-      <FilteredTasks isFinished={false} />
+      <FilteredTasks
+        tasks={tasks}
+        isFinished={false}
+        editting={editting}
+        setEditting={setEditting}
+        onUpdateTaskClick={onUpdateTaskClick}
+        onTaskChange={onTaskChange}
+        onRemoveClick={onRemoveTaskClick}
+      />
       <h2>完了</h2>
-      <FilteredTasks isFinished={true} />
+      <FilteredTasks
+        tasks={tasks}
+        isFinished={true}
+        editting={editting}
+        setEditting={setEditting}
+        onUpdateTaskClick={onUpdateTaskClick}
+        onTaskChange={onTaskChange}
+        onRemoveClick={onRemoveTaskClick}
+      />
     </>
   )
 }
