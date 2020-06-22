@@ -33,14 +33,6 @@ export const useTasks = () => {
     return res
   }
 
-  const toggleFinishState = async (task: TaskType) => {
-    const newTask = { ...task, isFinished: !task.isFinished }
-    const res = await Task.update(newTask)
-    const tasks = await Task.fetchAll()
-    setTasks(tasks)
-    return res
-  }
-
   const updateLocal = async (newTask: TaskType): Promise<void> => {
     const newTasks = tasks.map((task) => {
       if (task['id'] === newTask.id) {
@@ -52,5 +44,5 @@ export const useTasks = () => {
     setTasks(newTasks)
   }
 
-  return { tasks, updateLocal, add, remove, update, toggleFinishState }
+  return { tasks, updateLocal, add, remove, update }
 }
