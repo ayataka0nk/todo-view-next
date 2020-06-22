@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
-import { Button } from '../components/Button'
-import { EditableTextType, EditableText } from '../components/EditableText'
+import { Button } from '../components/atoms/Button'
+import {
+  EditableTextType,
+  EditableText,
+} from '../components/atoms/EditableText'
 
 const Sandbox: React.FC = () => {
   const [text, setText] = useState('default')

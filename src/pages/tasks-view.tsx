@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Textbox } from '../components/Textbox'
+import { Textbox } from '../components/atoms/Textbox'
 import { Task, TaskType } from '../model/Task'
 import { useTasks } from '../hooks/TasksHook'
-import { Checkbox } from '../components/Checkbox'
-import { EditableText } from '../components/EditableText'
+import { Checkbox } from '../components/atoms/Checkbox'
+import { EditableText } from '../components/atoms/EditableText'
 
 const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
   const { onAdd } = props
