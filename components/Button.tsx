@@ -27,7 +27,7 @@ const commonStyle = css`
   }
 `
 
-export const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
+export const Button: React.FC<ButtonProps> = (props) => {
   const { styleType } = props
   return (
     <>
