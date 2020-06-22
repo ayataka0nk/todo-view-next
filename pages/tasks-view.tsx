@@ -25,11 +25,20 @@ const TaskAddForm = (props: { onAdd: (text: string) => void }) => {
 
 const TaskItem = (props: {
   task: TaskType
+  editting: boolean
+  setEditting: (id: number | null) => void
   onEditEnd: (task: TaskType) => void
   onTaskChange: (task: TaskType) => void
   onRemoveClick: (id: number) => void
 }) => {
-  const { task, onEditEnd, onTaskChange, onRemoveClick } = props
+  const {
+    task,
+    editting,
+    setEditting,
+    onEditEnd,
+    onTaskChange,
+    onRemoveClick,
+  } = props
 
   const onEditEndLocal = () => {
     onEditEnd(task)
@@ -49,7 +58,11 @@ const TaskItem = (props: {
     onRemoveClick(task.id)
   }
   return (
-    <div className="columns">
+    <div
+      className="columns"
+      onDoubleClick={() => setEditting(task.id)}
+      onBlur={() => setEditting(null)}
+    >
       <div className="is-finished">
         <Checkbox
           name="isFinished"
@@ -60,6 +73,7 @@ const TaskItem = (props: {
       <div className="text">
         <EditableText
           name="text"
+          editting={editting}
           value={task.text}
           handleChange={handleChange}
           onEditEnd={onEditEndLocal}
@@ -93,7 +107,7 @@ const TaskItem = (props: {
 
 export default function Todo(): JSX.Element {
   const { tasks, updateLocal, add, remove, update } = useTasks()
-
+  const [editting, setEditting] = useState<number | null>(null)
   const onAddTaskClick = async (text: string): Promise<void> => {
     const res = await add(text)
     if (res.status === 201) {
@@ -133,10 +147,12 @@ export default function Todo(): JSX.Element {
       <div>
         {tasks
           .filter((task) => task.isFinished === props.isFinished)
-          .map((task) => (
+          .map((task, index) => (
             <TaskItem
               key={task.id}
               task={task}
+              editting={editting === task.id}
+              setEditting={setEditting}
               onEditEnd={onUpdateTaskClick}
               onTaskChange={onTaskChange}
               onRemoveClick={onRemoveTaskClick}

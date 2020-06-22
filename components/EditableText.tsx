@@ -3,22 +3,28 @@ import React, { useState, useRef, useEffect } from 'react'
 export type EditableTextType = {
   name: string
   value: string
+  editting?: boolean
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
   handleChange?: (name: string, value: string) => void
   onEditStart?: () => void
   onEditEnd?: () => void
 }
 export const EditableText: React.FC<EditableTextType> = (props) => {
-  const { name, value, onChange, onEditStart, onEditEnd, handleChange } = props
-  const [editting, setEditting] = useState(false)
+  const {
+    name,
+    value,
+    editting,
+    onChange,
+    onEditStart,
+    onEditEnd,
+    handleChange,
+  } = props
   const inputTextRef = useRef<HTMLInputElement>(null)
   const onDisplayTextClick = () => {
-    setEditting(true)
     onEditStart && onEditStart()
   }
   const onBlurEdittingText = () => {
     onEditEnd && onEditEnd()
-    setEditting(false)
   }
   const onChangeLocal = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange && onChange(event)
@@ -28,7 +34,6 @@ export const EditableText: React.FC<EditableTextType> = (props) => {
   useEffect(() => {
     if (editting === true) {
       inputTextRef.current?.focus()
-      console.log(inputTextRef.current)
     }
   }, [editting])
 
@@ -50,6 +55,10 @@ export const EditableText: React.FC<EditableTextType> = (props) => {
       </style>
     </>
   )
-  const DisplayText = <span onClick={onDisplayTextClick}>{value}</span>
+  const DisplayText = (
+    <>
+      <span onClick={onDisplayTextClick}>{value}</span>
+    </>
+  )
   return editting ? EdittingText : DisplayText
 }
