@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Task, TaskType } from '../model/Task'
+import { Task, TaskType, NewTaskType } from '../model/Task'
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<TaskType[]>([])
@@ -12,8 +12,8 @@ export const useTasks = () => {
     asyncWrap()
   }, [setTasks])
 
-  const add = async (text: string) => {
-    const res = await Task.add(text)
+  const add = async (task: NewTaskType) => {
+    const res = await Task.add(task)
     const tasks = await Task.fetchAll()
     setTasks(tasks)
     return res

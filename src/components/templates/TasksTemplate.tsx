@@ -1,11 +1,11 @@
 import React from 'react'
-import { TaskType } from '../../model/Task'
+import { NewTaskType, TaskType } from '../../model/Task'
 import { TaskAddForm } from '../molecules/TaskAddForm'
 import { Tasks } from '../organisms/Tasks'
 
 export type TasksTemplateProps = {
   tasks: TaskType[]
-  add: (text: string) => void
+  add: (task: NewTaskType) => void
   update: (task: TaskType) => void
   remove: (id: number) => void
   onTaskChange: (task: TaskType) => void

@@ -1,12 +1,12 @@
 import React from 'react'
-import { TaskType } from '../model/Task'
+import { NewTaskType, TaskType } from '../model/Task'
 import { useTasks } from '../hooks/TasksHook'
 import { TasksTemplate } from '../components/templates/TasksTemplate'
 
 const TasksView: React.FC = () => {
   const { tasks, updateLocal, add, remove, update } = useTasks()
-  const onAddTaskClick = async (text: string): Promise<void> => {
-    const res = await add(text)
+  const onAddTaskClick = async (task: NewTaskType): Promise<void> => {
+    const res = await add(task)
     if (res.status === 201) {
       console.log('登録成功')
     } else {

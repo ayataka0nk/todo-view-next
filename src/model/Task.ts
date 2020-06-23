@@ -5,6 +5,9 @@ export type TaskType = {
   text: string
   isFinished: boolean
 }
+export type NewTaskType = {
+  text: string
+}
 
 /**
  * 全件取得
@@ -20,14 +23,11 @@ const fetchAll = async (): Promise<TaskType[]> => {
  * 新規作成
  * @param text
  */
-const add = async (text: string) => {
-  const data = {
-    text: text,
-  }
+const add = async (task: NewTaskType) => {
   const urlTask = resolveApiPath('/api/tasks')
   const options = {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(task),
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
     },
