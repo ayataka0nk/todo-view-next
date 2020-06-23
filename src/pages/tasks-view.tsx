@@ -2,6 +2,7 @@ import React from 'react'
 import { NewTaskType, TaskType, persistenceOptions } from '../model/Task'
 import { TasksTemplate } from '../components/templates/TasksTemplate'
 import { useRestApiDataState } from '../hooks/RestApiDataState'
+import { DataStateError } from '../hooks/DataStateType'
 
 const TasksView: React.FC = () => {
   const { data: tasks, add, update, remove, change } = useRestApiDataState<
@@ -10,33 +11,23 @@ const TasksView: React.FC = () => {
   >(persistenceOptions.options)
 
   const onAddTaskClick = async (task: NewTaskType): Promise<void> => {
-    const res = await add(task)
-    if (res.status === 201) {
-      console.log('登録成功')
-    } else {
-      alert('登録: 不明なエラー')
+    const result = await add(task)
+    if (result instanceof DataStateError) {
+      alert(result.message)
     }
   }
 
   const onRemoveTaskClick = async (id: number): Promise<void> => {
-    const res = await remove(id)
-    if (res.status === 204) {
-      console.log('削除成功')
-    } else if (res.status === 404) {
-      alert('削除: リソースが存在しない')
-    } else {
-      alert('削除: 不明なエラー')
+    const result = await remove(id)
+    if (result instanceof DataStateError) {
+      alert(result.message)
     }
   }
 
   const onUpdateTaskClick = async (task: TaskType) => {
-    const res = await update(task)
-    if (res.status === 204) {
-      console.log('更新成功')
-    } else if (res.status === 404) {
-      alert('更新: リソースが存在しない')
-    } else {
-      alert('更新: 不明なエラー')
+    const result = await update(task)
+    if (result instanceof DataStateError) {
+      alert(result.message)
     }
   }
 

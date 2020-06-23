@@ -31,7 +31,8 @@ export default (req: NextApiRequest, res: NextApiResponse): void => {
     } else if (method === 'POST') {
       console.log(body.text)
       res.setHeader('Location', '/2')
-      res.status(201).send('')
+      res.status(201)
+      res.json({ errors: ['エラー1', 'エラー2'] })
     }
   }
 }
