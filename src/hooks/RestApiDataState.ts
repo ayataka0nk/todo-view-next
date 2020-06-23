@@ -11,8 +11,20 @@ import {
 class RestApiDataStateError extends DataStateError {
   public name = 'RestApiDataStateError'
 }
+
 type UnprocessableEntityResponse = {
   errors: string[]
+}
+
+const generateCommonErrorMessage = async (res: Response, name: string) => {
+  if (res.status === 422) {
+    const resJson: UnprocessableEntityResponse = await res.json()
+    return resJson.errors.join('\n')
+  } else if (res.status === 500) {
+    return `サーバエラーにより処理: ${name} に失敗しました。`
+  } else {
+    return `不明なエラーにより処理: ${name} に失敗しました。`
+  }
 }
 
 export const useRestApiDataState = <T extends Primary, U>(
@@ -45,18 +57,14 @@ export const useRestApiDataState = <T extends Primary, U>(
 
   const add = async (newModel: U) => {
     const res = await callPost(options.path, JSON.stringify(newModel))
-    if (res.status === 422) {
-      const resJson: UnprocessableEntityResponse = await res.json()
-      const message = resJson.errors.join('\n')
+    if (res.status === 201) {
+      const newData = await fetchAll(options.path)
+      if (newData instanceof RestApiDataStateError) return newData
+      setData(newData)
+    } else {
+      const message = await generateCommonErrorMessage(res, '追加')
       return new RestApiDataStateError(message)
-    } else if (res.status !== 201) {
-      return new RestApiDataStateError(
-        '不明なエラーによりデータの追加に失敗しました。'
-      )
     }
-    const newData = await fetchAll(options.path)
-    if (newData instanceof RestApiDataStateError) return newData
-    setData(newData)
   }
 
   const update = async (model: T) => {
@@ -64,30 +72,26 @@ export const useRestApiDataState = <T extends Primary, U>(
       options.path + '/' + model.id,
       JSON.stringify(model)
     )
-    if (res.status === 422) {
-      const resJson: UnprocessableEntityResponse = await res.json()
-      const message = resJson.errors.join('\n')
+    if (res.status === 204) {
+      const newData = await fetchAll(options.path)
+      if (newData instanceof RestApiDataStateError) return newData
+      setData(newData)
+    } else {
+      const message = await generateCommonErrorMessage(res, '更新')
       return new RestApiDataStateError(message)
-    } else if (res.status !== 204) {
-      return new RestApiDataStateError(
-        '不明なエラーによりデータの更新に失敗しました。'
-      )
     }
-    const newData = await fetchAll(options.path)
-    if (newData instanceof RestApiDataStateError) return newData
-    setData(newData)
   }
 
   const remove = async (id: number) => {
     const res = await callDelete(options.path + '/' + id)
-    if (res.status !== 204) {
-      return new RestApiDataStateError(
-        '不明なエラーによりデータの削除に失敗しました。'
-      )
+    if (res.status === 204) {
+      const newData = await fetchAll(options.path)
+      if (newData instanceof RestApiDataStateError) return newData
+      setData(newData)
+    } else {
+      const message = await generateCommonErrorMessage(res, '削除')
+      return new RestApiDataStateError(message)
     }
-    const newData = await fetchAll(options.path)
-    if (newData instanceof RestApiDataStateError) return newData
-    setData(newData)
   }
 
   const change = (model: T) => {
