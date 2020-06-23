@@ -1,6 +1,5 @@
 import React from 'react'
 import { NewTaskType, TaskType, persistenceOptions } from '../model/Task'
-import { useTasks } from '../hooks/TasksHook'
 import { TasksTemplate } from '../components/templates/TasksTemplate'
 import { useRestApiDataState } from '../hooks/RestApiDataState'
 
