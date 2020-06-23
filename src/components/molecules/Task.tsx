@@ -36,12 +36,14 @@ export const Task: React.FC<TaskProps> = (props) => {
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onTaskChange(getChangedTask(task, event))
+    const newTask = getChangedTask(task, event)
+    onTaskChange(newTask)
   }
 
   const handleChangeWithSave = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onTaskChange(getChangedTask(task, event))
-    update(task)
+    const newTask = getChangedTask(task, event)
+    onTaskChange(newTask)
+    update(newTask)
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
