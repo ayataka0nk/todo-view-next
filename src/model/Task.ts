@@ -5,6 +5,7 @@ export type TaskType = {
   text: string
   isFinished: boolean
 }
+
 export type NewTaskType = {
   text: string
 }

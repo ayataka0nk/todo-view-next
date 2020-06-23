@@ -1,10 +1,15 @@
 import React from 'react'
-import { NewTaskType, TaskType } from '../model/Task'
+import { Task, NewTaskType, TaskType } from '../model/Task'
 import { useTasks } from '../hooks/TasksHook'
 import { TasksTemplate } from '../components/templates/TasksTemplate'
+import { useRestApiDataState } from '../hooks/RestApiDataState'
 
 const TasksView: React.FC = () => {
-  const { tasks, updateLocal, add, remove, update } = useTasks()
+  const { data: tasks, add, update, remove, change } = useRestApiDataState<
+    TaskType,
+    NewTaskType
+  >(Task)
+
   const onAddTaskClick = async (task: NewTaskType): Promise<void> => {
     const res = await add(task)
     if (res.status === 201) {
@@ -37,7 +42,7 @@ const TasksView: React.FC = () => {
   }
 
   const onTaskChange = async (task: TaskType): Promise<void> => {
-    updateLocal(task)
+    change(task)
   }
 
   return (
