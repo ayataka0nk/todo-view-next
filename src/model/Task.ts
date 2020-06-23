@@ -1,4 +1,5 @@
 import { resolveApiPath } from '../libs/ApiPathResolver'
+import { PersistenceOptions } from './ModelType'
 
 export type TaskType = {
   id: number
@@ -8,6 +9,13 @@ export type TaskType = {
 
 export type NewTaskType = {
   text: string
+}
+
+export const persistenceOptions: PersistenceOptions = {
+  type: 'rest',
+  options: {
+    path: '/api/tasks',
+  },
 }
 
 /**

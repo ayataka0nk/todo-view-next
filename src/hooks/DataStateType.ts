@@ -1,4 +1,4 @@
-import { Primary } from '../model/RestApiModelType'
+import { Primary } from '../model/ModelType'
 
 export type DataStateType<T extends Primary, U> = {
   data: T[]

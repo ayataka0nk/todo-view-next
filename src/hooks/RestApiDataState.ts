@@ -1,38 +1,53 @@
 import { useState, useEffect } from 'react'
-import { Primary, RestApiActions } from '../model/RestApiModelType'
+import { Primary, RestOptions } from '../model/ModelType'
 import { DataStateType } from './DataStateType'
+import {
+  callGet,
+  callPost,
+  callPatch,
+  callDelete,
+} from '../libs/RestApiActions'
 
 export const useRestApiDataState = <T extends Primary, U>(
-  restApiModel: RestApiActions<T, U>
+  options: RestOptions
 ): DataStateType<T, U> => {
   const [data, setData] = useState<T[]>([])
 
+  const fetchAll = async (path: string) => {
+    const res = await callGet(path)
+    const resData = await res.json()
+    return resData
+  }
+
   useEffect(() => {
     const asyncWrap = async () => {
-      const data = await restApiModel.fetchAll()
-      setData(data)
+      const newData = await fetchAll(options.path)
+      setData(newData)
     }
     asyncWrap()
   }, [setData])
 
   const add = async (newModel: U) => {
-    const res = await restApiModel.add(newModel)
-    const data = await restApiModel.fetchAll()
-    setData(data)
+    const res = await callPost(options.path, JSON.stringify(newModel))
+    const newData = await fetchAll(options.path)
+    setData(newData)
     return res
   }
 
   const update = async (model: T) => {
-    const res = await restApiModel.update(model)
-    const data = await restApiModel.fetchAll()
-    setData(data)
+    const res = await callPatch(
+      options.path + '/' + model.id,
+      JSON.stringify(model)
+    )
+    const newData = await fetchAll(options.path)
+    setData(newData)
     return res
   }
 
   const remove = async (id: number) => {
-    const res = await restApiModel.remove(id)
-    const data = await restApiModel.fetchAll()
-    setData(data)
+    const res = await callDelete(options.path + '/' + id)
+    const newData = await fetchAll(options.path)
+    setData(newData)
     return res
   }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Task, NewTaskType, TaskType } from '../model/Task'
+import { NewTaskType, TaskType, persistenceOptions } from '../model/Task'
 import { useTasks } from '../hooks/TasksHook'
 import { TasksTemplate } from '../components/templates/TasksTemplate'
 import { useRestApiDataState } from '../hooks/RestApiDataState'
@@ -8,7 +8,7 @@ const TasksView: React.FC = () => {
   const { data: tasks, add, update, remove, change } = useRestApiDataState<
     TaskType,
     NewTaskType
-  >(Task)
+  >(persistenceOptions.options)
 
   const onAddTaskClick = async (task: NewTaskType): Promise<void> => {
     const res = await add(task)
