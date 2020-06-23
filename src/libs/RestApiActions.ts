@@ -10,7 +10,7 @@ export const callPost = async (path: string, body: string) => {
   const url = resolveApiPath(path)
   const options = {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: body,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
     },
@@ -23,7 +23,7 @@ export const callPatch = async (path: string, body: string) => {
   const url = resolveApiPath(path)
   const options = {
     method: 'PATCH',
-    body: JSON.stringify(body),
+    body: body,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
     },
