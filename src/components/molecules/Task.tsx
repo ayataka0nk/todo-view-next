@@ -6,50 +6,63 @@ import { EditableText } from '../atoms/EditableText'
 export type TaskProps = {
   task: TaskType
   editting: boolean
-  setEditting: (id: number | null) => void
-  onEditEnd: (task: TaskType) => void
+  startEdit: (id: number) => void
+  endEdit: (id: number) => void
+  update: (task: TaskType) => void
+  remove: (id: number) => void
   onTaskChange: (task: TaskType) => void
-  onRemoveClick: (id: number) => void
 }
 
 export const Task: React.FC<TaskProps> = (props) => {
   const {
     task,
     editting,
-    setEditting,
-    onEditEnd,
+    startEdit,
+    endEdit,
+    update,
+    remove,
     onTaskChange,
-    onRemoveClick,
   } = props
 
-  const onEditEndLocal = () => {
-    onEditEnd(task)
+  const getChangedTask = (
+    task: TaskType,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.type === 'checkbox') {
+      return { ...task, [event.target.name]: event.target.checked }
+    } else {
+      return { ...task, [event.target.name]: event.target.value }
+    }
   }
 
-  const handleChange = (name: string, value: string | boolean) => {
-    const newTask = Object.assign(task)
-    newTask[name] = value
-    onTaskChange(newTask)
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onTaskChange(getChangedTask(task, event))
   }
 
-  const handleChangeWithSave = (name: string, value: boolean) => {
-    handleChange(name, value)
-    onEditEnd(task)
+  const handleChangeWithSave = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onTaskChange(getChangedTask(task, event))
+    update(task)
   }
-  const onRemoveClickLocal = () => {
-    onRemoveClick(task.id)
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    endEdit(task.id)
   }
+
+  const onRemoveClick = () => {
+    remove(task.id)
+  }
+
   return (
     <div
       className="columns"
-      onDoubleClick={() => setEditting(task.id)}
-      onBlur={() => setEditting(null)}
+      onDoubleClick={() => startEdit(task.id)}
+      onBlur={() => endEdit(task.id)}
     >
       <div className="is-finished">
         <Checkbox
           name="isFinished"
           value={task.isFinished}
-          handleChange={handleChangeWithSave}
+          onChange={handleChangeWithSave}
         />
       </div>
       <div className="text">
@@ -57,12 +70,12 @@ export const Task: React.FC<TaskProps> = (props) => {
           name="text"
           editting={editting}
           value={task.text}
-          handleChange={handleChange}
-          onEditEnd={onEditEndLocal}
+          onChange={handleChange}
+          onBlur={handleBlur}
         />
       </div>
       <div className="delete-button">
-        <button onClick={onRemoveClickLocal}>削除</button>
+        <button onClick={onRemoveClick}>削除</button>
       </div>
 
       <style jsx>{`

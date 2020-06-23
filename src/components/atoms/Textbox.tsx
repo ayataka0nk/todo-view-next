@@ -3,7 +3,7 @@ import React from 'react'
 export type TextboxProps = {
   name: string
   value: string
-  onChange: (name: string, value: string) => void
+  onChange?: (name: string, value: string) => void
   onBlur?: (event: React.FocusEvent<HTMLElement>) => void
   readOnly?: boolean
 }

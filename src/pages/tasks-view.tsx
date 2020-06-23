@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { TaskType } from '../model/Task'
 import { useTasks } from '../hooks/TasksHook'
 import { TasksTemplate } from '../components/templates/TasksTemplate'
 
 const TasksView: React.FC = () => {
   const { tasks, updateLocal, add, remove, update } = useTasks()
-  const [editting, setEditting] = useState<number | null>(null)
   const onAddTaskClick = async (text: string): Promise<void> => {
     const res = await add(text)
     if (res.status === 201) {
@@ -40,14 +39,13 @@ const TasksView: React.FC = () => {
   const onTaskChange = async (task: TaskType): Promise<void> => {
     updateLocal(task)
   }
+
   return (
     <TasksTemplate
       tasks={tasks}
-      editting={editting}
-      setEditting={setEditting}
-      onAddTaskClick={onAddTaskClick}
-      onRemoveTaskClick={onRemoveTaskClick}
-      onUpdateTaskClick={onUpdateTaskClick}
+      add={onAddTaskClick}
+      update={onUpdateTaskClick}
+      remove={onRemoveTaskClick}
       onTaskChange={onTaskChange}
     />
   )
